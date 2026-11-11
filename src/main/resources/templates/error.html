@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - MD Store</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header class="main-header">
+    <div class="container">
+        <div class="header-inner">
+            <a href="/" class="logo"><div class="logo-mark">MD</div><div class="logo-text">MD <span>Store</span></div></a>
+            <div></div><div></div>
+        </div>
+    </div>
+</header>
+
+<div class="container" style="min-height:70vh;display:flex;align-items:center;justify-content:center;padding:40px 0;">
+    <div style="text-align:center;max-width:500px;">
+        <div style="font-size:5rem;margin-bottom:16px;" th:text="${statusCode == 404 ? '🔍' : '⚠️'}">⚠️</div>
+        <h1 style="font-family:var(--font-display);font-size:3rem;font-weight:900;margin-bottom:8px;"
+            th:text="${statusCode}">500</h1>
+        <h2 style="font-weight:600;margin-bottom:12px;">
+            <span th:if="${statusCode == 404}">Page Not Found</span>
+            <span th:if="${statusCode == 403}">Access Denied</span>
+            <span th:if="${statusCode == 500}">Something Went Wrong</span>
+            <span th:unless="${statusCode == 404 or statusCode == 403 or statusCode == 500}">Unexpected Error</span>
+        </h2>
+        <p style="color:var(--gray-500);margin-bottom:28px;" th:text="${errorMessage}">An error occurred.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <a href="/" class="btn btn-primary">🏠 Go Home</a>
+            <a href="/products" class="btn btn-outline">🛍 Browse Products</a>
+        </div>
+        <div style="margin-top:24px;font-size:0.8rem;color:var(--gray-500);">
+            If this keeps happening, please <a href="/contact" style="color:var(--yellow);">contact support</a>.
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/api.js}"></script>
+</body>
+</html>

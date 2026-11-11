@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - MD Store</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="announcement-bar">🚚 Free shipping on orders above ₹5000 &nbsp;|&nbsp; 15-day return policy</div>
+
+<header class="main-header">
+    <div class="container">
+        <div class="header-inner">
+            <a href="/" class="logo"><div class="logo-mark">MD</div><div class="logo-text">MD <span>Store</span></div></a>
+            <form class="search-bar" action="/products" method="get">
+                <input type="text" name="q" placeholder="Search products...">
+                <button type="submit" class="search-btn"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button>
+            </form>
+            <div class="header-actions">
+                <a href="/cart" class="icon-btn"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span class="badge cart-badge" style="display:none">0</span><span>Cart</span></a>
+                <a href="/profile" class="icon-btn"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg><span>Account</span></a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container" style="padding-top:28px;padding-bottom:60px;">
+    <div class="breadcrumbs"><a href="/">Home</a><span>/</span><span>My Orders</span></div>
+
+    <div class="profile-layout" style="margin-top:24px;">
+
+        <!-- Sidebar -->
+        <aside class="profile-sidebar">
+            <div class="profile-avatar">
+                <div class="avatar-circle" th:text="${userName != null ? userName.substring(0,1).toUpperCase() : 'U'}">U</div>
+                <div class="avatar-name" th:text="${userName != null ? userName : 'My Account'}">Name</div>
+            </div>
+            <nav class="profile-nav">
+                <a href="/profile">👤 Profile</a>
+                <a href="/orders" class="active">📦 My Orders</a>
+                <a href="/wishlist">❤️ Wishlist</a>
+                <a href="/logout" style="color:#e53935;">🚪 Sign Out</a>
+            </nav>
+        </aside>
+
+        <!-- Orders content -->
+        <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                <h2 style="font-size:1.4rem;font-weight:700;">My Orders</h2>
+                <span style="color:var(--gray-500);font-size:0.875rem;"
+                      th:text="${orders != null ? orders.size() + ' order(s) found' : '0 orders'}"></span>
+            </div>
+
+            <!-- Filter tabs -->
+            <div class="tabs" style="margin-bottom:24px;">
+                <button class="tab-btn active" onclick="filterOrders('all', this)">All</button>
+                <button class="tab-btn" onclick="filterOrders('Processing', this)">Processing</button>
+                <button class="tab-btn" onclick="filterOrders('Shipped', this)">Shipped</button>
+                <button class="tab-btn" onclick="filterOrders('Delivered', this)">Delivered</button>
+            </div>
+
+            <!-- ✅ Orders from database -->
+            <div id="orders-list" th:if="${orders != null and !#lists.isEmpty(orders)}">
+                <div class="order-card"
+                     th:each="order : ${orders}"
+                     th:attr="data-status=${order.status}">
+
+                    <!-- Order Header -->
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--gray-200);">
+                        <div>
+                            <div style="font-weight:700;font-size:1rem;" th:text="${order.orderCode}">MD000001</div>
+                            <div style="font-size:0.8rem;color:var(--gray-500);margin-top:2px;" th:text="'Placed on ' + ${order.formattedDate}">Date</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <span class="order-status-badge"
+                                  th:classappend="${order.statusClass}"
+                                  th:text="${order.statusEmoji + ' ' + order.status}">Status</span>
+                            <div style="font-weight:700;margin-top:4px;" th:text="${order.formattedTotal}">₹0</div>
+                        </div>
+                    </div>
+
+                    <!-- Order Item -->
+                    <div style="display:flex;gap:16px;align-items:center;">
+                        <img th:if="${order.productImage != null and !#strings.isEmpty(order.productImage)}"
+                             th:src="${order.productImage}"
+                             style="width:70px;height:70px;object-fit:cover;border-radius:8px;flex-shrink:0;"
+                             onerror="this.style.display='none'">
+                        <div style="flex:1;">
+                            <div style="font-weight:600;margin-bottom:4px;" th:text="${order.productName}">Product</div>
+                            <div style="font-size:0.8rem;color:var(--gray-500);" th:text="${order.brand}">Brand</div>
+                            <div style="font-size:0.85rem;color:var(--gray-700);margin-top:4px;">
+                                Qty: <span th:text="${order.quantity}">1</span> &nbsp;|&nbsp;
+                                <span th:text="${order.paymentMethod}">COD</span>
+                            </div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                            <a th:href="@{/product-detail(id=${order.productId})}"
+                               class="btn btn-outline btn-sm">View Product</a>
+                            <button th:if="${order.status == 'Processing'}"
+                                    class="btn btn-sm"
+                                    style="background:#fff3e0;color:#e65100;border:1px solid #ffcc02;"
+                                    onclick="alert('Return request submitted!')">Cancel</button>
+                            <button th:if="${order.status == 'Delivered'}"
+                                    class="btn btn-sm"
+                                    style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;"
+                                    onclick="alert('Return request submitted!')">Return</button>
+                        </div>
+                    </div>
+
+                    <!-- Shipping address -->
+                    <div th:if="${order.shippingAddress != null}"
+                         style="margin-top:12px;padding:10px 14px;background:var(--gray-100);border-radius:8px;font-size:0.8rem;color:var(--gray-500);">
+                        📍 <span th:text="${order.shippingAddress}">Address</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div class="empty-state" th:if="${orders == null or #lists.isEmpty(orders)}">
+                <div class="empty-icon">📦</div>
+                <h3>No Orders Yet</h3>
+                <p>You haven't placed any orders. Start shopping now!</p>
+                <a href="/products" class="btn btn-primary">🛍 Browse Products</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    window.isLoggedIn = /*[[${loggedIn}]]*/ false;
+    window.currentUserId = /*[[${userId}]]*/ null;
+</script>
+<script th:src="@{/js/api.js}"></script>
+<script>
+function filterOrders(status, btn) {
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    document.querySelectorAll('.order-card').forEach(function(card) {
+        card.style.display = (status === 'all' || card.dataset.status === status) ? '' : 'none';
+    });
+}
+</script>
+</body>
+</html>

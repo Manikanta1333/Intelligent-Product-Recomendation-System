@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - MD Store</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="announcement-bar">🔒 Secure Checkout &nbsp;|&nbsp; 100% Safe & Encrypted</div>
+
+<header class="main-header">
+    <div class="container">
+        <div class="header-inner">
+            <a href="/" class="logo"><div class="logo-mark">MD</div><div class="logo-text">MD <span>Store</span></div></a>
+            <div style="color:var(--gray-500);font-size:0.9rem;">🔒 Secure Checkout</div>
+            <div class="header-actions">
+                <a href="/cart" class="icon-btn">← Back to Cart</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container" style="padding-top:32px;padding-bottom:60px;">
+    <div class="breadcrumbs"><a href="/">Home</a><span>/</span><a href="/cart">Cart</a><span>/</span><span>Checkout</span></div>
+
+    <!-- ✅ POST to /checkout — handled by OrderController -->
+    <form action="/checkout" method="post" id="checkout-form" onsubmit="return validateCheckout()" style="margin-top:24px;">
+
+        <!-- Buy Now hidden fields (if coming from product detail) -->
+        <input type="hidden" name="productId"     th:value="${buyNowProduct != null ? buyNowProduct.productId : ''}">
+        <input type="hidden" name="productName"   th:value="${buyNowProduct != null ? buyNowProduct.name : ''}">
+        <input type="hidden" name="productImage"  th:value="${buyNowProduct != null ? buyNowProduct.image : ''}">
+        <input type="hidden" name="brand"         th:value="${buyNowProduct != null ? buyNowProduct.brand : ''}">
+        <input type="hidden" name="quantity"      th:value="${buyNowQty != null ? buyNowQty : 1}" id="order-qty">
+        <input type="hidden" name="price"         th:value="${buyNowProduct != null ? buyNowProduct.salePrice : 0}" id="order-price">
+        <input type="hidden" name="paymentMethod" id="payment-method-input" value="COD">
+
+        <div class="checkout-grid">
+
+            <!-- ===== LEFT: FORM ===== -->
+            <div>
+                <!-- STEP 1: Delivery Address -->
+                <div style="background:var(--white);border-radius:var(--radius-lg);padding:28px;margin-bottom:20px;box-shadow:var(--shadow-sm);">
+                    <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+                        <span style="background:var(--yellow);color:var(--black);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;">1</span>
+                        Delivery Address
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">First Name *</label>
+                            <input type="text" name="firstName" class="form-control" placeholder="John" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name *</label>
+                            <input type="text" name="lastName" class="form-control" placeholder="Doe" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Street Address *</label>
+                            <input type="text" name="address" class="form-control" placeholder="House no, Street, Area" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">City *</label>
+                            <input type="text" name="city" class="form-control" placeholder="Mumbai" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">PIN Code *</label>
+                            <input type="text" name="pincode" class="form-control" placeholder="400001"
+                                   pattern="[0-9]{6}" title="6-digit PIN code" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">State *</label>
+                            <select name="state" class="form-control form-select" required>
+                                <option value="">Select State</option>
+                                <option>Andhra Pradesh</option><option>Assam</option>
+                                <option>Bihar</option><option>Delhi</option>
+                                <option>Goa</option><option>Gujarat</option>
+                                <option>Haryana</option><option>Himachal Pradesh</option>
+                                <option>Jharkhand</option><option>Karnataka</option>
+                                <option>Kerala</option><option>Madhya Pradesh</option>
+                                <option>Maharashtra</option><option>Odisha</option>
+                                <option>Punjab</option><option>Rajasthan</option>
+                                <option>Tamil Nadu</option><option>Telangana</option>
+                                <option>Uttar Pradesh</option><option>Uttarakhand</option>
+                                <option>West Bengal</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Payment Method -->
+                <div style="background:var(--white);border-radius:var(--radius-lg);padding:28px;box-shadow:var(--shadow-sm);">
+                    <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+                        <span style="background:var(--yellow);color:var(--black);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;">2</span>
+                        Payment Method
+                    </h3>
+
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                        <label class="payment-option active" id="pay-cod" onclick="selectPayment('COD', this)">
+                            <input type="radio" name="payment_choice" value="COD" checked style="display:none">
+                            <span style="font-size:1.3rem;">💵</span>
+                            <div><strong>Cash on Delivery</strong><div style="font-size:0.8rem;color:var(--gray-500);">Pay when your order arrives</div></div>
+                            <span style="margin-left:auto;color:#2e7d32;font-size:0.8rem;font-weight:600;">FREE</span>
+                        </label>
+
+                        <label class="payment-option" id="pay-upi" onclick="selectPayment('UPI', this)">
+                            <input type="radio" name="payment_choice" value="UPI" style="display:none">
+                            <span style="font-size:1.3rem;">📱</span>
+                            <div><strong>UPI</strong><div style="font-size:0.8rem;color:var(--gray-500);">PhonePe, GPay, Paytm</div></div>
+                        </label>
+
+                        <label class="payment-option" id="pay-card" onclick="selectPayment('Card', this)">
+                            <input type="radio" name="payment_choice" value="Card" style="display:none">
+                            <span style="font-size:1.3rem;">💳</span>
+                            <div><strong>Credit / Debit Card</strong><div style="font-size:0.8rem;color:var(--gray-500);">Visa, Mastercard, RuPay</div></div>
+                        </label>
+
+                        <label class="payment-option" id="pay-nb" onclick="selectPayment('NetBanking', this)">
+                            <input type="radio" name="payment_choice" value="NetBanking" style="display:none">
+                            <span style="font-size:1.3rem;">🏦</span>
+                            <div><strong>Net Banking</strong><div style="font-size:0.8rem;color:var(--gray-500);">All major banks supported</div></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== RIGHT: ORDER SUMMARY ===== -->
+            <div>
+                <div style="background:var(--white);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm);position:sticky;top:80px;">
+                    <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;">Order Summary</h3>
+
+                    <!-- Buy Now product summary -->
+                    <div th:if="${buyNowProduct != null}" style="border-bottom:1px solid var(--gray-200);padding-bottom:16px;margin-bottom:16px;">
+                        <div style="display:flex;gap:12px;align-items:center;">
+                            <img th:if="${buyNowProduct.image != null}"
+                                 th:src="${buyNowProduct.image}"
+                                 style="width:60px;height:60px;object-fit:cover;border-radius:8px;"
+                                 onerror="this.style.display='none'">
+                            <div>
+                                <div style="font-weight:600;font-size:0.875rem;" th:text="${buyNowProduct.name}">Product</div>
+                                <div style="color:var(--gray-500);font-size:0.8rem;" th:text="${buyNowProduct.brand}">Brand</div>
+                                <div style="font-weight:700;color:var(--yellow);" th:text="${buyNowProduct.formattedSalePrice}">₹0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cart summary (loaded by JS) -->
+                    <div id="cart-summary-items" th:if="${buyNowProduct == null}">
+                        <!-- JS fills this from localStorage cart -->
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:8px;font-size:0.9rem;padding:12px 0;border-top:1px solid var(--gray-200);">
+                        <div style="display:flex;justify-content:space-between;">
+                            <span style="color:var(--gray-500);">Subtotal</span>
+                            <span id="summary-subtotal"
+                                  th:text="${buyNowProduct != null ? buyNowProduct.formattedSalePrice : '₹0'}">₹0</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;">
+                            <span style="color:var(--gray-500);">Shipping</span>
+                            <span style="color:#2e7d32;font-weight:600;">FREE</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:700;padding-top:8px;border-top:1px solid var(--gray-200);">
+                            <span>Total</span>
+                            <span id="summary-total" style="color:var(--yellow);"
+                                  th:text="${buyNowProduct != null ? buyNowProduct.formattedSalePrice : '₹0'}">₹0</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg btn-block"
+                            style="justify-content:center;margin-top:16px;" id="place-order-btn">
+                        ✅ Place Order
+                    </button>
+
+                    <div style="margin-top:12px;font-size:0.75rem;color:var(--gray-500);text-align:center;">
+                        🔒 Your payment info is 100% secure
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script th:inline="javascript">
+    window.isLoggedIn = /*[[${loggedIn}]]*/ false;
+    window.currentUserId = /*[[${userId}]]*/ null;
+</script>
+<script th:src="@{/js/api.js}"></script>
+<script>
+function selectPayment(method, el) {
+    document.querySelectorAll('.payment-option').forEach(function(o) { o.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById('payment-method-input').value = method;
+}
+
+// Load cart summary from localStorage (for cart checkout)
+document.addEventListener('DOMContentLoaded', function() {
+    var summaryEl = document.getElementById('cart-summary-items');
+    if (!summaryEl) return;
+    var cartItems = MDStore.Cart.getAll();
+    if (!cartItems || cartItems.length === 0) {
+        summaryEl.innerHTML = '<p style="color:var(--gray-500);font-size:0.875rem;">No items in cart</p>';
+        return;
+    }
+    var total = 0;
+    var html = '';
+    cartItems.forEach(function(item) {
+        total += item.price * item.qty;
+        html += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:0.85rem;">' +
+                '<span style="flex:1;padding-right:8px;">' + item.name + ' ×' + item.qty + '</span>' +
+                '<span style="font-weight:600;">₹' + (item.price * item.qty).toLocaleString('en-IN', {maximumFractionDigits:0}) + '</span>' +
+                '</div>';
+    });
+    summaryEl.innerHTML = html;
+    var fmt = '₹' + total.toLocaleString('en-IN', {maximumFractionDigits:0});
+    document.getElementById('summary-subtotal').textContent = fmt;
+    document.getElementById('summary-total').textContent    = fmt;
+    // Set price for server (cart total)
+    document.getElementById('order-price').value = total;
+});
+
+function validateCheckout() {
+    var btn = document.getElementById('place-order-btn');
+    btn.innerHTML = '<span class="spinner"></span> Placing Order...';
+    btn.disabled  = true;
+    return true; // HTML5 required attributes handle validation
+}
+</script>
+</body>
+</html>

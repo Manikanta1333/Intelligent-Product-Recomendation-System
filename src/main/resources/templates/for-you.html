@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>For You — MD Store</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+  <style>
+    .fy-hero {
+      background: var(--black);
+      padding: 56px 20px 48px; text-align: center;
+      border-bottom: 3px solid var(--yellow);
+    }
+    .fy-hero-badge {
+      display: inline-block;
+      background: var(--yellow); color: var(--black);
+      border-radius: 30px; padding: 5px 20px;
+      font-size: .82rem; font-weight: 800;
+      letter-spacing: .06em; margin-bottom: 18px;
+      text-transform: uppercase;
+    }
+    .fy-hero h1 {
+      font-family: var(--font-display);
+      font-size: 2.8rem; font-weight: 800;
+      color: var(--white); margin-bottom: 12px;
+    }
+    .fy-hero h1 span { color: var(--yellow); }
+    .fy-hero p { font-size: 1.05rem; color: var(--gray-500); }
+
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+    .section    { padding: 48px 0; }
+
+    .cat-heading {
+      display: flex; align-items: baseline; gap: 12px;
+      margin-bottom: 8px;
+    }
+    .cat-heading h2 {
+      font-family: var(--font-display);
+      font-size: 1.4rem; font-weight: 800; color: var(--black);
+    }
+    .cat-heading .cat-sub { font-size: .88rem; color: var(--gray-500); font-weight: 400; }
+    .cat-meta { font-size: .88rem; color: var(--gray-500); margin-bottom: 20px; }
+    .cat-meta strong { color: var(--black); }
+    .cat-divider { border: none; border-top: 2px solid var(--gray-200); margin: 36px 0; }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 20px;
+    }
+    .product-card {
+      background: var(--white); border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.07);
+      overflow: hidden; position: relative;
+      transition: transform .22s, box-shadow .22s;
+      display: flex; flex-direction: column;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 28px rgba(0,0,0,.13);
+    }
+    .card-img-wrap {
+      height: 185px; background: var(--gray-100);
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .card-img-wrap .no-img { font-size: 3.5rem; }
+    .card-body { padding: 14px; flex: 1; }
+    .card-brand {
+      font-size: .7rem; color: var(--gray-500);
+      font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+    }
+    .card-name {
+      font-size: .9rem; font-weight: 700; color: var(--black);
+      margin: 4px 0; line-height: 1.35;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .card-rating { font-size: .8rem; color: #c9a84c; margin-bottom: 8px; }
+    .card-prices { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .price-sale  { font-size: 1rem; font-weight: 800; color: var(--black); }
+    .price-orig  { font-size: .78rem; color: var(--gray-500); text-decoration: line-through; }
+    .price-disc  { font-size: .73rem; font-weight: 700; color: #16a34a; }
+
+    .score-bar  { height: 3px; background: var(--gray-200); border-radius: 2px; margin-top: 8px; }
+    .score-fill { height: 100%; border-radius: 2px; background: var(--yellow); }
+
+    .card-footer { padding: 10px 14px; border-top: 1px solid var(--gray-100); }
+    .btn-view {
+      width: 100%; padding: 9px; border-radius: 8px; border: none; cursor: pointer;
+      background: var(--black); color: var(--yellow);
+      font-weight: 800; font-size: .83rem; font-family: var(--font-body);
+      text-decoration: none; display: block; text-align: center; transition: background .2s;
+    }
+    .btn-view:hover { background: #222; }
+
+    .for-you-badge {
+      position: absolute; top: 10px; left: 10px;
+      background: var(--yellow); color: var(--black);
+      font-size: .68rem; font-weight: 800;
+      padding: 4px 10px; border-radius: 20px; letter-spacing: .04em;
+    }
+
+    .info-card {
+      background: var(--white); border-radius: 14px;
+      padding: 48px 32px; text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,.07);
+      border-top: 4px solid var(--yellow);
+    }
+    .info-card .icon { font-size: 3rem; margin-bottom: 16px; }
+    .info-card h2 {
+      font-family: var(--font-display);
+      font-size: 1.4rem; font-weight: 800; margin-bottom: 8px;
+    }
+    .info-card p { color: var(--gray-500); margin-bottom: 24px; }
+
+    .spotlight-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .section-label {
+      font-family: var(--font-display);
+      font-size: 1.3rem; font-weight: 800;
+      color: var(--black); margin-bottom: 6px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid var(--yellow);
+      display: inline-block;
+    }
+    .section-sub { color: var(--gray-500); font-size: .9rem; margin-bottom: 22px; }
+
+    @media(max-width: 600px) {
+      .fy-hero h1 { font-size: 1.9rem; }
+      .product-grid, .spotlight-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="announcement-bar">
+  🚚 Free shipping on orders above ₹5000 &nbsp;|&nbsp; 15-day return policy &nbsp;|&nbsp; 24/7 Support
+</div>
+
+<!-- HEADER -->
+<header class="main-header">
+  <div class="container">
+    <div class="header-inner">
+      <a th:href="@{/}" class="logo">
+        <div class="logo-mark">MD</div>
+        <div class="logo-text">MD <span>Store</span></div>
+      </a>
+      <form class="search-bar" th:action="@{/products}" method="get">
+        <input type="text" name="q" placeholder="Search products, brands and more..." autocomplete="off"/>
+        <button type="submit" class="search-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+        </button>
+      </form>
+      <div class="header-actions">
+        <a th:href="@{/wishlist}" class="icon-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+          </svg>
+          <span class="badge wishlist-badge" style="display:none">0</span><span>Wishlist</span>
+        </a>
+        <a th:href="@{/cart}" class="icon-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+          <span class="badge cart-badge" style="display:none">0</span><span>Cart</span>
+        </a>
+        <!-- ✅ Thymeleaf-driven login/account display -->
+        <a th:if="${!loggedIn}" th:href="@{/login}" class="icon-btn sign-in-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          <span>Sign In</span>
+        </a>
+        <a th:if="${loggedIn}" th:href="@{/profile}" class="icon-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          <span th:text="${userName ?: 'Account'}">Account</span>
+        </a>
+        <a th:if="${loggedIn}" th:href="@{/logout}" class="btn btn-outline btn-sm">Logout</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- CATEGORY NAV -->
+<nav class="category-nav">
+  <div class="container">
+    <ul class="nav-list">
+      <li class="nav-item"><a th:href="@{/}">Home</a></li>
+      <li class="nav-item"><a th:href="@{/products}">All Products</a></li>
+      <li class="nav-item"><a th:href="@{/for-you}" class="active" style="color:var(--yellow);font-weight:700;">✨ For You</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="fy-hero">
+  <div class="fy-hero-badge">✨ AI-Powered Recommendations</div>
+  <h1>Your <span>Personal</span> Store</h1>
+  <p th:if="${isLoggedIn}"  th:text="'Hand-picked just for you, ' + ${userName}"></p>
+  <p th:if="${!isLoggedIn}">Discover products loved by shoppers like you</p>
+</div>
+
+<div class="container">
+
+  <!-- ══════════════════════════════════════════
+       CASE 1: Logged in + has category recommendations
+       Shows ALL categories user has interacted with, top 5 each
+  ══════════════════════════════════════════ -->
+  <!-- ✅ Fixed: use categoryMap != null and categoryMap.size() > 0 instead of #maps.isEmpty() -->
+  <div th:if="${isLoggedIn and !notEnoughOrders and categoryMap != null and categoryMap.size() > 0}">
+    <div th:each="entry : ${categoryMap}" class="section">
+      <div class="cat-heading">
+        <!-- Category icon + name -->
+        <h2 th:text="${entry.key}"></h2>
+        <span class="cat-sub">— Top picks based on your orders</span>
+      </div>
+      <p class="cat-meta">
+        Hybrid AI ranked <strong th:text="${entry.value.size()}"></strong> picks just for you.
+      </p>
+      <div class="product-grid">
+        <div th:each="rp : ${entry.value}" class="product-card">
+          <div class="for-you-badge">⭐ For You</div>
+          <a th:href="@{/product-detail(id=${rp.productId})}"
+             style="text-decoration:none;color:inherit;display:flex;flex-direction:column;flex:1;">
+            <div class="card-img-wrap">
+              <!-- ✅ Fixed: use rp.hasImage() method instead of rp.image.isEmpty() to avoid NPE -->
+              <img th:if="${rp.hasImage()}"
+                   th:src="${rp.image}" th:alt="${rp.productName ?: ''}" loading="lazy"
+                   style="width:100%;height:100%;object-fit:cover;"
+                   onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+              <span class="no-img" th:unless="${rp.hasImage()}"
+                    th:text="${rp.categoryIcon ?: '🛒'}">🛒</span>
+            </div>
+            <div class="card-body">
+              <div class="card-brand"  th:text="${rp.brand ?: ''}"></div>
+              <div class="card-name"   th:text="${rp.productName ?: 'Product'}"></div>
+              <!-- ✅ Fixed: use rp.starDisplay from RankedProduct delegate getter -->
+              <div class="card-rating" th:text="${rp.starDisplay} + (${rp.ratings != null} ? ' ' + ${rp.ratings} : '')"></div>
+              <div class="card-prices">
+                <!-- ✅ Use RankedProduct's formattedSalePrice and formattedPrice delegates -->
+                <span class="price-sale" th:text="${rp.formattedSalePrice}"></span>
+                <span th:if="${rp.discount != null and rp.discount > 0}"
+                      class="price-orig" th:text="${rp.formattedPrice}"></span>
+                <span th:if="${rp.discount != null and rp.discount > 0}"
+                      class="price-disc" th:text="${rp.discount + '% off'}"></span>
+              </div>
+              <!-- AI confidence bar -->
+              <div class="score-bar" title="AI confidence score">
+                <div class="score-fill"
+                     th:style="'width:' + ${#numbers.formatDecimal(rp.hybridScore * 100, 1, 0)} + '%'"></div>
+              </div>
+            </div>
+          </a>
+          <div class="card-footer">
+            <a th:href="@{/product-detail(id=${rp.productId})}" class="btn-view">View Details</a>
+          </div>
+        </div>
+      </div>
+      <hr class="cat-divider"/>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       CASE 2: Logged in but no orders yet → popular products
+  ══════════════════════════════════════════ -->
+  <div th:if="${isLoggedIn and notEnoughOrders}" class="section">
+    <div class="info-card">
+      <div class="icon">🛍️</div>
+      <h2>Place your first order to unlock personalised picks!</h2>
+      <p>Once you order from any category, our AI will start showing hand-picked recommendations here.</p>
+      <a th:href="@{/products}" class="btn btn-primary btn-lg">Start Shopping</a>
+    </div>
+    <div style="margin-top:44px;">
+      <div class="section-label">🔥 Trending Right Now</div>
+      <p class="section-sub">Our most popular products while you explore.</p>
+      <div class="product-grid">
+        <div th:each="p : ${recommendations}" class="product-card">
+          <a th:href="@{/product-detail(id=${p.productId})}"
+             style="text-decoration:none;color:inherit;display:flex;flex-direction:column;flex:1;">
+            <div class="card-img-wrap">
+              <img th:if="${p.image != null and !p.image.isEmpty()}"
+                   th:src="${p.image}" th:alt="${p.name}" loading="lazy"
+                   style="width:100%;height:100%;object-fit:cover;"
+                   onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+              <span class="no-img" th:unless="${p.image != null and !p.image.isEmpty()}"
+                    th:text="${p.categoryIcon}">🛒</span>
+            </div>
+            <div class="card-body">
+              <div class="card-brand"  th:text="${p.brand ?: ''}"></div>
+              <div class="card-name"   th:text="${p.name ?: 'Product'}"></div>
+              <div class="card-rating" th:text="${p.starDisplay} + (${p.ratings != null} ? ' ' + ${p.ratings} : '')"></div>
+              <div class="card-prices">
+                <span class="price-sale" th:text="${p.formattedSalePrice}"></span>
+                <span th:if="${p.discount != null and p.discount > 0}"
+                      class="price-orig" th:text="${p.formattedPrice}"></span>
+                <span th:if="${p.discount != null and p.discount > 0}"
+                      class="price-disc" th:text="${p.discount + '% off'}"></span>
+              </div>
+            </div>
+          </a>
+          <div class="card-footer">
+            <a th:href="@{/product-detail(id=${p.productId})}" class="btn-view">View</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       CASE 3: Not logged in → sign-in prompt + popular
+  ══════════════════════════════════════════ -->
+  <div th:if="${!isLoggedIn}" class="section">
+    <div class="info-card">
+      <div class="icon">🔒</div>
+      <h2>Sign in to get personalised recommendations</h2>
+      <p>Our AI learns from your orders and tailors picks just for you.</p>
+      <a th:href="@{/login}" class="btn btn-primary btn-lg">Login / Register</a>
+    </div>
+    <div style="margin-top:44px;">
+      <div class="section-label">🌟 Most Popular</div>
+      <p class="section-sub">Top-rated products everyone loves.</p>
+      <div class="product-grid">
+        <div th:each="p : ${recommendations}" class="product-card">
+          <a th:href="@{/product-detail(id=${p.productId})}"
+             style="text-decoration:none;color:inherit;display:flex;flex-direction:column;flex:1;">
+            <div class="card-img-wrap">
+              <img th:if="${p.image != null and !p.image.isEmpty()}"
+                   th:src="${p.image}" th:alt="${p.name}" loading="lazy"
+                   style="width:100%;height:100%;object-fit:cover;"
+                   onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+              <span class="no-img" th:unless="${p.image != null and !p.image.isEmpty()}"
+                    th:text="${p.categoryIcon}">🛒</span>
+            </div>
+            <div class="card-body">
+              <div class="card-brand"  th:text="${p.brand ?: ''}"></div>
+              <div class="card-name"   th:text="${p.name ?: 'Product'}"></div>
+              <div class="card-rating" th:text="${p.starDisplay} + (${p.ratings != null} ? ' ' + ${p.ratings} : '')"></div>
+              <div class="card-prices">
+                <span class="price-sale" th:text="${p.formattedSalePrice}"></span>
+              </div>
+            </div>
+          </a>
+          <div class="card-footer">
+            <a th:href="@{/product-detail(id=${p.productId})}" class="btn-view">View</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SPOTLIGHT SECTIONS (always shown at bottom)
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">📱 Top Phones</div>
+    <p class="section-sub" style="margin-top:8px;">Best-rated phones right now.</p>
+    <div class="spotlight-grid">
+      <div th:each="p : ${topPhones}" class="product-card">
+        <a th:href="@{/product-detail(id=${p.productId})}"
+           style="text-decoration:none;color:inherit;display:flex;flex-direction:column;flex:1;">
+          <div class="card-img-wrap">
+            <img th:if="${p.image != null and !p.image.isEmpty()}"
+                 th:src="${p.image}" th:alt="${p.name}" loading="lazy"
+                 style="width:100%;height:100%;object-fit:cover;"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+            <span class="no-img" th:unless="${p.image != null and !p.image.isEmpty()}">📱</span>
+          </div>
+          <div class="card-body">
+            <div class="card-brand"  th:text="${p.brand ?: ''}"></div>
+            <div class="card-name"   th:text="${p.name ?: 'Product'}"></div>
+            <div class="card-rating" th:text="${p.starDisplay} + (${p.ratings != null} ? ' ' + ${p.ratings} : '')"></div>
+            <span class="price-sale" th:text="${p.formattedSalePrice}"></span>
+          </div>
+        </a>
+        <div class="card-footer">
+          <a th:href="@{/product-detail(id=${p.productId})}" class="btn-view">View</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:0">
+    <div class="section-label">👗 Top Fashion</div>
+    <p class="section-sub" style="margin-top:8px;">Trending women's fashion picks.</p>
+    <div class="spotlight-grid">
+      <div th:each="p : ${topFashion}" class="product-card">
+        <a th:href="@{/product-detail(id=${p.productId})}"
+           style="text-decoration:none;color:inherit;display:flex;flex-direction:column;flex:1;">
+          <div class="card-img-wrap">
+            <img th:if="${p.image != null and !p.image.isEmpty()}"
+                 th:src="${p.image}" th:alt="${p.name}" loading="lazy"
+                 style="width:100%;height:100%;object-fit:cover;"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+            <span class="no-img" th:unless="${p.image != null and !p.image.isEmpty()}">👗</span>
+          </div>
+          <div class="card-body">
+            <div class="card-brand"  th:text="${p.brand ?: ''}"></div>
+            <div class="card-name"   th:text="${p.name ?: 'Product'}"></div>
+            <div class="card-rating" th:text="${p.starDisplay} + (${p.ratings != null} ? ' ' + ${p.ratings} : '')"></div>
+            <span class="price-sale" th:text="${p.formattedSalePrice}"></span>
+          </div>
+        </a>
+        <div class="card-footer">
+          <a th:href="@{/product-detail(id=${p.productId})}" class="btn-view">View</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:0; padding-bottom:60px;">
+    <div class="section-label">🎧 Top Headphones</div>
+    <p class="section-sub" style="margin-top:8px;">Top-rated audio gear.</p>
+    <div class="spotlight-grid">
+      <div th:each="p : ${topElectronics}" class="product-card">
+        <a th:href="@{/product-detail(id=${p.productId})}"
+           style="text-decoration:none;color:inherit;display:flex;flex-direction:column;flex:1;">
+          <div class="card-img-wrap">
+            <img th:if="${p.image != null and !p.image.isEmpty()}"
+                 th:src="${p.image}" th:alt="${p.name}" loading="lazy"
+                 style="width:100%;height:100%;object-fit:cover;"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+            <span class="no-img" th:unless="${p.image != null and !p.image.isEmpty()}">🎧</span>
+          </div>
+          <div class="card-body">
+            <div class="card-brand"  th:text="${p.brand ?: ''}"></div>
+            <div class="card-name"   th:text="${p.name ?: 'Product'}"></div>
+            <div class="card-rating" th:text="${p.starDisplay} + (${p.ratings != null} ? ' ' + ${p.ratings} : '')"></div>
+            <span class="price-sale" th:text="${p.formattedSalePrice}"></span>
+          </div>
+        </a>
+        <div class="card-footer">
+          <a th:href="@{/product-detail(id=${p.productId})}" class="btn-view">View</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a th:href="@{/}" class="logo" style="margin-bottom:16px">
+          <div class="logo-mark">MD</div>
+          <div class="logo-text" style="color:var(--white)">MD <span>Store</span></div>
+        </a>
+        <p>Your trusted destination for premium quality products.</p>
+      </div>
+      <div class="footer-col"><h4>Quick Links</h4><ul>
+        <li><a th:href="@{/}">Home</a></li>
+        <li><a th:href="@{/products}">All Products</a></li>
+        <li><a th:href="@{/for-you}">✨ For You</a></li>
+        <li><a th:href="@{/about}">About</a></li>
+        <li><a th:href="@{/contact}">Contact</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Categories</h4><ul>
+        <li><a th:href="@{/products(category='Phones')}">Phones</a></li>
+        <li><a th:href="@{/products(category='Womens Fashion')}">Fashion</a></li>
+        <li><a th:href="@{/products(category='Strength Training')}">Sports</a></li>
+        <li><a th:href="@{/products(category='Make-up')}">Beauty</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Account</h4><ul>
+        <li><a th:href="@{/orders}">My Orders</a></li>
+        <li><a th:href="@{/cart}">Cart</a></li>
+        <li><a th:href="@{/wishlist}">Wishlist</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 MD Store. All rights reserved.</p></div>
+  </div>
+</footer>
+
+<script th:inline="javascript">
+    window.isLoggedIn = /*[[${loggedIn}]]*/ false;
+    window.currentUserId = /*[[${userId}]]*/ null;
+</script>
+<script th:src="@{/js/api.js}"></script>
+</body>
+</html>

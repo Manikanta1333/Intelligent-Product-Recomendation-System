@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - MD Store</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="auth-page">
+    <div class="auth-container" style="max-width:500px;">
+
+        <div class="auth-logo">
+            <a href="/" class="logo" style="justify-content:center;">
+                <div class="logo-mark" style="width:52px;height:52px;font-size:1.6rem;">MD</div>
+                <div class="logo-text" style="font-size:1.8rem;">MD <span>Store</span></div>
+            </a>
+        </div>
+
+        <div class="auth-card">
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join MD Store and start shopping</p>
+
+            <!-- ✅ Server flash messages -->
+            <div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+            <!-- ✅ POST to /register -->
+            <form action="/register" method="post" onsubmit="return validateRegister()">
+
+                <div class="form-group">
+                    <label class="form-label" for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" class="form-control"
+                           placeholder="John Doe" required autocomplete="name">
+                    <div class="form-error" id="name-error">Please enter your full name</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" class="form-control"
+                           placeholder="you@example.com" required autocomplete="email">
+                    <div class="form-error" id="email-error">Please enter a valid email</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="form-control"
+                           placeholder="+91 98765 43210" autocomplete="tel">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password *</label>
+                    <div style="position:relative;">
+                        <input type="password" id="password" name="password" class="form-control"
+                               placeholder="Minimum 6 characters" required
+                               style="padding-right:50px;" oninput="checkStrength(this.value)"
+                               autocomplete="new-password">
+                        <button type="button" onclick="togglePwd()"
+                                style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;">👁</button>
+                    </div>
+                    <div class="form-error" id="pass-error">Password must be at least 6 characters</div>
+                    <!-- Strength meter -->
+                    <div style="margin-top:6px;">
+                        <div style="height:4px;background:var(--gray-200);border-radius:4px;overflow:hidden;">
+                            <div id="strength-bar" style="height:100%;width:0%;transition:all 0.3s;border-radius:4px;"></div>
+                        </div>
+                        <span id="strength-text" style="font-size:0.75rem;font-weight:600;"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirm-password">Confirm Password *</label>
+                    <input type="password" id="confirm-password" class="form-control"
+                           placeholder="Re-enter your password" required autocomplete="new-password">
+                    <div class="form-error" id="confirm-error">Passwords do not match</div>
+                </div>
+
+                <div class="checkbox-row">
+                    <input type="checkbox" id="terms" required>
+                    <label for="terms">
+                        I agree to the <a href="#" style="color:var(--yellow);">Terms</a> &amp;
+                        <a href="#" style="color:var(--yellow);">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <button type="submit" id="register-btn"
+                        class="btn btn-primary btn-lg btn-block" style="justify-content:center;">
+                    Create Free Account
+                </button>
+            </form>
+
+            <!-- Welcome offer -->
+            <div style="background:rgba(212,160,23,0.08);border:1px solid rgba(212,160,23,0.2);
+                        border-radius:8px;padding:12px 16px;margin-top:16px;font-size:0.82rem;">
+                🎁 <strong>Welcome Offer:</strong> Use code
+                <strong style="color:var(--yellow);">WELCOME</strong> for 10% off your first order!
+            </div>
+        </div>
+
+        <div class="auth-footer">
+            Already have an account? <a href="/login">Sign in here</a>
+        </div>
+        <div class="auth-footer" style="margin-top:8px;">
+            <a href="/" style="color:var(--gray-500);">← Back to Home</a>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/api.js}"></script>
+<script>
+function togglePwd() {
+    var input = document.getElementById('password');
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function checkStrength(pwd) {
+    var bar  = document.getElementById('strength-bar');
+    var text = document.getElementById('strength-text');
+    var score = 0;
+    if (pwd.length >= 6)        score++;
+    if (pwd.length >= 10)       score++;
+    if (/[A-Z]/.test(pwd))     score++;
+    if (/[0-9]/.test(pwd))     score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+
+    var labels = ['', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+    var colors = ['', '#e53935', '#f57c00', '#f9a825', '#43a047', '#1b5e20'];
+    var widths = ['0%', '20%', '40%', '60%', '80%', '100%'];
+
+    bar.style.width      = widths[score];
+    bar.style.background = colors[score];
+    text.textContent     = labels[score];
+    text.style.color     = colors[score];
+}
+
+function validateRegister() {
+    var name    = document.getElementById('name').value.trim();
+    var email   = document.getElementById('email').value.trim();
+    var pass    = document.getElementById('password').value;
+    var confirm = document.getElementById('confirm-password').value;
+    var terms   = document.getElementById('terms').checked;
+    var valid   = true;
+
+    if (name.length < 2) {
+        document.getElementById('name').classList.add('is-invalid');
+        valid = false;
+    } else { document.getElementById('name').classList.remove('is-invalid'); }
+
+    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        document.getElementById('email').classList.add('is-invalid');
+        valid = false;
+    } else { document.getElementById('email').classList.remove('is-invalid'); }
+
+    if (pass.length < 6) {
+        document.getElementById('password').classList.add('is-invalid');
+        valid = false;
+    } else { document.getElementById('password').classList.remove('is-invalid'); }
+
+    if (pass !== confirm) {
+        document.getElementById('confirm-password').classList.add('is-invalid');
+        valid = false;
+    } else { document.getElementById('confirm-password').classList.remove('is-invalid'); }
+
+    if (!terms) {
+        alert('Please accept the Terms & Conditions to continue.');
+        valid = false;
+    }
+
+    if (valid) {
+        var btn = document.getElementById('register-btn');
+        btn.innerHTML = '<span class="spinner"></span> Creating Account...';
+        btn.disabled = true;
+    }
+    return valid;
+}
+</script>
+</body>
+</html>

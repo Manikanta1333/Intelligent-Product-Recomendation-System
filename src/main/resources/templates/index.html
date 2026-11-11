@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD Store - Premium Shopping Destination</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="announcement-bar">
+    🚚 Free shipping on orders above ₹5000 &nbsp;|&nbsp; 15-day return policy &nbsp;|&nbsp; 24/7 Support
+</div>
+
+<header class="main-header">
+    <div class="container">
+        <div class="header-inner">
+            <a href="/" class="logo">
+                <div class="logo-mark">MD</div>
+                <div class="logo-text">MD <span>Store</span></div>
+            </a>
+            <form class="search-bar" action="/products" method="get">
+                <input type="text" name="q" placeholder="Search products, brands and more..." autocomplete="off">
+                <button type="submit" class="search-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                </button>
+            </form>
+            <div class="header-actions">
+                <a href="/wishlist" class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                    <span class="badge wishlist-badge" style="display:none">0</span><span>Wishlist</span>
+                </a>
+                <a href="/cart" class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    <span class="badge cart-badge" style="display:none">0</span><span>Cart</span>
+                </a>
+                <a th:if="${!loggedIn}" href="/login" class="icon-btn sign-in-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <span>Sign In</span>
+                </a>
+                <a th:if="${loggedIn}" href="/profile" class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <span th:text="${userName ?: 'Account'}">Account</span>
+                </a>
+                <a th:if="${loggedIn}" href="/logout" class="icon-btn" style="font-size:0.8rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ===== NAVBAR — category links replaced with For You ===== -->
+<nav class="category-nav">
+    <div class="container">
+        <ul class="nav-list">
+            <li class="nav-item"><a href="/" class="active">Home</a></li>
+            <li class="nav-item"><a href="/products">All Products</a></li>
+            <li class="nav-item"><a href="/for-you" style="color:#c9a84c;font-weight:700;">✨ For You</a></li>
+        </ul>
+    </div>
+</nav>
+
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-inner">
+            <div class="hero-content">
+                <div class="hero-eyebrow">✦ Premium Quality Guaranteed</div>
+                <h1 class="hero-title">Discover <span class="highlight">Quality Products</span><br>For Every Lifestyle</h1>
+                <p class="hero-desc">Shop from thousands of handpicked products across electronics, fashion, baby care, sports, and beauty.</p>
+                <div class="hero-btns">
+                    <a href="/products" class="btn btn-primary btn-lg">🛍 Shop Now</a>
+                    <a href="/about" class="btn btn-outline btn-lg">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-image-grid">
+                <a href="/products?category=Phones" class="hero-img-card">
+                    <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop&auto=format" alt="Phones" loading="eager">
+                    <div class="hero-img-label">Phones</div>
+                </a>
+                <a href="/products?category=Womens+Fashion" class="hero-img-card">
+                    <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=400&fit=crop&auto=format" alt="Fashion" loading="eager">
+                    <div class="hero-img-label">Fashion</div>
+                </a>
+                <a href="/products?category=Strength+Training" class="hero-img-card">
+                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=400&fit=crop&auto=format" alt="Sports" loading="eager">
+                    <div class="hero-img-label">Sports</div>
+                </a>
+                <a href="/products?category=Make-up" class="hero-img-card">
+                    <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop&auto=format" alt="Beauty" loading="eager">
+                    <div class="hero-img-label">Make-up</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="features-strip">
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature-item"><div class="feature-icon">🚚</div><div class="feature-text"><strong>Free Shipping</strong><span>On orders above ₹5000</span></div></div>
+            <div class="feature-item"><div class="feature-icon">🔄</div><div class="feature-text"><strong>Easy Returns</strong><span>15-day return policy</span></div></div>
+            <div class="feature-item"><div class="feature-icon">🔒</div><div class="feature-text"><strong>Secure Payment</strong><span>100% safe & encrypted</span></div></div>
+            <div class="feature-item"><div class="feature-icon">🎧</div><div class="feature-text"><strong>24/7 Support</strong><span>Always here to help</span></div></div>
+        </div>
+    </div>
+</div>
+
+<section class="section" style="background:var(--white);">
+    <div class="container">
+        <div class="section-header">
+            <div><h2 class="section-title">Shop by Category</h2><p class="section-subtitle">Explore our wide range</p></div>
+            <a href="/products" class="btn btn-outline btn-sm">View All</a>
+        </div>
+        <div class="categories-grid-img">
+            <a href="/products?category=Phones" class="cat-img-card">
+                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&h=220&fit=crop&auto=format" alt="Phones" loading="lazy"></div>
+                <div class="cat-img-label">📱 Phones</div>
+            </a>
+            <a href="/products?category=Televisions" class="cat-img-card">
+                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1593784991095-a205069470b6?w=300&h=220&fit=crop&auto=format" alt="Televisions" loading="lazy"></div>
+                <div class="cat-img-label">📺 Televisions</div>
+            </a>
+            <a href="/products?category=Headphones" class="cat-img-card">
+                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=220&fit=crop&auto=format" alt="Headphones" loading="lazy"></div>
+                <div class="cat-img-label">🎧 Headphones</div>
+            </a>
+            <a href="/products?category=Cameras" class="cat-img-card">
+                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=300&h=220&fit=crop&auto=format" alt="Cameras" loading="lazy"></div>
+                <div class="cat-img-label">📷 Cameras</div>
+            </a>
+            <a href="/products?category=Womens+Fashion" class="cat-img-card">
+                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=300&h=220&fit=crop&auto=format" alt="Womens Fashion" loading="lazy"></div>
+                <div class="cat-img-label">👗 Womens Fashion</div>
+            </a>
+            <a href="/products?category=Mens+Shirts" class="cat-img-card">
+                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&h=220&fit=crop&auto=format" alt="Mens Shirts" loading="lazy"></div>
+                <div class="cat-img-label">👔 Mens Shirts</div>
+            </a>
+            <a href="/products?category=Mens+Watches" class="cat-img-card">
+                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=220&fit=crop&auto=format" alt="Mens Watches" loading="lazy"></div>
+                <div class="cat-img-label">⌚ Mens Watches</div>
+            </a>
+            <a href="/products?category=Handbags+and+Clutches" class="cat-img-card">
+                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&h=220&fit=crop&auto=format" alt="Handbags" loading="lazy"></div>
+                <div class="cat-img-label">👜 Handbags</div>
+            </a>
+            <a href="/products?category=Make-up" class="cat-img-card">
+                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=300&h=220&fit=crop&auto=format" alt="Make-up" loading="lazy"></div>
+                <div class="cat-img-label">💄 Make-up</div>
+            </a>
+            <a href="/products?category=Baby+Products" class="cat-img-card">
+                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=300&h=220&fit=crop&auto=format" alt="Baby Products" loading="lazy"></div>
+                <div class="cat-img-label">🍼 Baby Products</div>
+            </a>
+            <a href="/products?category=Toys" class="cat-img-card">
+                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=220&fit=crop&auto=format" alt="Toys" loading="lazy"></div>
+                <div class="cat-img-label">🧸 Toys</div>
+            </a>
+            <a href="/products?category=Strength+Training" class="cat-img-card">
+                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=300&h=220&fit=crop&auto=format" alt="Strength Training" loading="lazy"></div>
+                <div class="cat-img-label">🏋️ Strength Training</div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <div><h2 class="section-title">Featured Products</h2><p class="section-subtitle">Handpicked deals just for you</p></div>
+            <a href="/products" class="btn btn-outline btn-sm">View All →</a>
+        </div>
+
+        <div class="products-grid" th:if="${products != null and !#lists.isEmpty(products)}">
+            <div class="product-card" th:each="p : ${products}">
+
+                <span class="product-badge hot"
+                      th:if="${p.discount != null and p.discount >= 30}"
+                      th:text="${p.discount + '% OFF'}"></span>
+                <span class="product-badge new"
+                      th:if="${p.discount != null and p.discount > 0 and p.discount < 30}"
+                      th:text="${p.discount + '% OFF'}"></span>
+
+                <div class="product-img-wrap">
+                    <a th:href="@{/product-detail(id=${p.productId})}">
+                        <img th:if="${p.image != null and !#strings.isEmpty(p.image)}"
+                             th:src="${p.image}"
+                             th:alt="${p.name}"
+                             loading="lazy"
+                             style="width:100%;height:100%;object-fit:cover;"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <div class="product-img-placeholder"
+                             th:style="${p.image == null or #strings.isEmpty(p.image)} ? 'display:flex' : 'display:none'">
+                            <span >🛒</span>
+                        </div>
+                    </a>
+                    <button class="wishlist-btn"
+                            th:attr="data-id=${p.productId},
+                                     data-name=${p.name},
+                                     data-brand=${p.brand != null ? p.brand : ''},
+                                     data-price=${p.actualPrice != null and p.discount != null ? p.actualPrice * (1 - p.discount / 100.0) : (p.actualPrice ?: 0)},
+                                     data-image=${p.image != null ? p.image : ''}">♥</button>
+                </div>
+
+                <div class="product-info">
+                    <div class="product-brand" th:text="${p.brand != null ? p.brand : 'MD Store'}">Brand</div>
+                    <div class="product-name">
+                        <a th:href="@{/product-detail(id=${p.productId})}"
+                           th:text="${p.name}"
+                           style="color:inherit;text-decoration:none;">Product Name</a>
+                    </div>
+                    <div class="product-rating" th:if="${p.ratings != null}">
+                        <span class="stars" th:text="${p.ratings != null} ? ${#strings.repeat('★', T(java.lang.Math).round(p.ratings.floatValue())) + #strings.repeat('☆', 5 - T(java.lang.Math).round(p.ratings.floatValue()))} : '★★★★☆'">★★★★☆</span>
+                        <span class="rating-count"
+                              th:text="'(' + ${p.noOfRatings != null ? p.noOfRatings : 0} + ')'"></span>
+                    </div>
+                    <div class="product-price-row">
+                        <span class="product-price" th:with="sp=${p.discount != null and p.discount > 0 and p.actualPrice != null} ? ${p.actualPrice * (1 - p.discount / 100.0)} : ${p.actualPrice}" th:text="${sp != null} ? '₹' + ${#numbers.formatDecimal(sp, 0, 'COMMA', 0, 'POINT')} : ''">₹0</span>
+                        <span class="product-price-old"
+                              th:if="${p.discount != null and p.discount > 0}"
+                              th:text="${p.actualPrice != null} ? '₹' + ${#numbers.formatDecimal(p.actualPrice, 0, 'COMMA', 0, 'POINT')} : ''"></span>
+                        <span class="product-discount"
+                              th:if="${p.discount != null and p.discount > 0}"
+                              th:text="${p.discount + '% off'}"></span>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn btn-primary btn-sm add-to-cart-btn"
+                                th:attr="data-id=${p.productId},
+                                         data-name=${p.name},
+                                         data-brand=${p.brand != null ? p.brand : ''},
+                                         data-price=${p.actualPrice != null and p.discount != null ? p.actualPrice * (1 - p.discount / 100.0) : (p.actualPrice ?: 0)},
+                                         data-image=${p.image != null ? p.image : ''}">
+                            🛒 Add to Cart
+                        </button>
+                        <a th:href="@{/product-detail(id=${p.productId})}"
+                           class="btn btn-outline btn-sm">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="empty-state" th:if="${products == null or #lists.isEmpty(products)}">
+            <div class="empty-icon">📦</div>
+            <h3>No Products Found</h3>
+            <p>Products from recomender_db will appear here.</p>
+        </div>
+    </div>
+</section>
+
+<section style="background:var(--black);padding:60px 0;">
+    <div class="container" style="text-align:center;max-width:600px;margin:0 auto;">
+        <div style="color:var(--yellow);font-size:0.85rem;font-weight:700;letter-spacing:0.1em;margin-bottom:12px;">LIMITED TIME OFFER</div>
+        <h2 style="font-family:var(--font-display);font-size:2.5rem;color:var(--white);margin-bottom:16px;">Get Extra 10% Off<br><span style="color:var(--yellow)">On Your First Order</span></h2>
+        <p style="color:var(--gray-500);margin-bottom:28px;">Use code <strong style="color:var(--yellow);background:rgba(212,160,23,0.1);padding:4px 10px;border-radius:4px;">WELCOME</strong> at checkout</p>
+        <a href="/register" class="btn btn-primary btn-lg">Create Free Account</a>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="/" class="logo" style="margin-bottom:16px">
+                    <div class="logo-mark">MD</div>
+                    <div class="logo-text" style="color:var(--white)">MD <span>Store</span></div>
+                </a>
+                <p>Your trusted destination for premium quality products delivered to your doorstep.</p>
+            </div>
+            <div class="footer-col"><h4>Quick Links</h4><ul><li><a href="/">Home</a></li><li><a href="/products">All Products</a></li><li><a href="/for-you">✨ For You</a></li><li><a href="/about">About</a></li><li><a href="/contact">Contact</a></li></ul></div>
+            <div class="footer-col"><h4>Categories</h4><ul><li><a href="/products?category=Phones">Phones</a></li><li><a href="/products?category=Womens+Fashion">Fashion</a></li><li><a href="/products?category=Strength+Training">Sports</a></li><li><a href="/products?category=Make-up">Beauty</a></li></ul></div>
+            <div class="footer-col"><h4>Account</h4><ul><li><a href="/orders">My Orders</a></li><li><a href="/cart">Cart</a></li><li><a href="/wishlist">Wishlist</a></li><li><a href="/profile">Profile</a></li></ul></div>
+        </div>
+        <div class="footer-bottom"><p>&copy; 2026 MD Store. All rights reserved.</p></div>
+    </div>
+</footer>
+
+<script th:inline="javascript">
+    window.isLoggedIn = /*[[${loggedIn}]]*/ false;
+    window.currentUserId = /*[[${userId}]]*/ null;
+</script>
+<script th:src="@{/js/api.js}"></script>
+<script>
+document.querySelectorAll('.add-to-cart-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        MDStore.Cart.add({
+            id:    parseInt(btn.dataset.id),
+            name:  btn.dataset.name,
+            brand: btn.dataset.brand || '',
+            price: parseFloat(btn.dataset.price) || 0,
+            image: btn.dataset.image || ''
+        }, 1);
+        var orig = btn.innerHTML;
+        btn.textContent = '✓ Added';
+        setTimeout(function() { btn.innerHTML = orig; }, 1500);
+    });
+});
+
+document.querySelectorAll('.wishlist-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var added = MDStore.Wishlist.toggle({
+            id:    parseInt(btn.dataset.id),
+            name:  btn.dataset.name,
+            brand: btn.dataset.brand || '',
+            price: parseFloat(btn.dataset.price) || 0,
+            image: btn.dataset.image || ''
+        });
+        btn.classList.toggle('active', added);
+    });
+});
+</script>
+</body>
+</html>
